@@ -66,4 +66,23 @@ TOTAL: $7.97
 """
         XCTAssertEqual(expectedReceipt, receipt.output())
     }
+    
+    //extra tests i created myself
+    func testSingleItemSubtotal() {
+        let register = Register()
+        let pencil = Item(name: "Pencil", priceEach: 99)
+
+        register.scan(pencil)
+
+        let subtotal = register.subtotal()
+        XCTAssertEqual(subtotal, 99)
+        }
+    
+    func testRegisterResetsAfterTotal() {
+        register.scan(Item(name: "Pencil", priceEach: 99))
+        _ = register.total()
+
+        XCTAssertEqual(0, register.subtotal())
+    }
+
 }
