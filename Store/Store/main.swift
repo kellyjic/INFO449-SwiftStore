@@ -28,14 +28,13 @@ class Item: SKU {
 
 class Receipt {
     private var scannedItems: [SKU] = []
+    private let discountTotal: Int
     
-    init(scannedItems: [SKU]) {
+    init(scannedItems: [SKU], discount: Int) {
         self.scannedItems = scannedItems
+        self.discountTotal = discount
+        
     }
-    
-//    func scan(_ item: SKU) {
-//        scannedItems.append(item)
-//    }
     
     func items() -> [SKU] {
         return scannedItems
@@ -46,7 +45,7 @@ class Receipt {
         for item in scannedItems {
             sum += item.price()
         }
-        return sum
+        return sum - discountTotal
     }
 
     func output() -> String {
@@ -65,27 +64,64 @@ class Receipt {
         return lines.joined(separator: "\n")
     }
 
-    
 }
 
 class Register {
     private var scannedItems: [SKU] = []
+    private var coupons: [Coupon] = []
     
     func scan(_ item: SKU) {
         scannedItems.append(item)
     }
+    
+    func addCoupon(_ coupon: Coupon) {
+            coupons.append(coupon)
+        }
     
     func subtotal() -> Int {
         scannedItems.map { $0.price() }.reduce(0, +)
     }
     
     func total() -> Receipt {
-        let receipt = Receipt(scannedItems: scannedItems)
+        
+        print("Coupons count:", coupons.count)
+        
+        var discountTotal = 0
+
+        for coupon in coupons {
+            discountTotal += coupon.discount(for: scannedItems)
+        }
+
+        let receipt = Receipt(
+            scannedItems: scannedItems,
+            discount: discountTotal
+        )
+
         scannedItems.removeAll()
+        coupons = []
+        
         return receipt
     }
-
 }
+
+class Coupon {
+    let itemName: String
+    let percentOff: Int = 15
+
+    init(itemName: String) {
+        self.itemName = itemName
+    }
+
+    func discount(for items: [SKU]) -> Int {
+        for item in items {
+            if item.name == itemName {
+                return (item.price() * percentOff) / 100
+            }
+        }
+        return 0
+    }
+}
+
 
 class Store {
     let version = "0.1"

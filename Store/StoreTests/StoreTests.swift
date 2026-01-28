@@ -84,5 +84,28 @@ TOTAL: $7.97
 
         XCTAssertEqual(0, register.subtotal())
     }
+    
+    func testCouponGeneral() {
+        register.scan(Item(name: "Beans (8oz Can)", priceEach: 199))
+            register.addCoupon(Coupon(itemName: "Beans (8oz Can)"))
+
+            let receipt = register.total()
+
+            XCTAssertEqual(170, receipt.total())
+    }
+    
+    func testCouponAppliesToOnlyOneItem() {
+        register.scan(Item(name: "Beans", priceEach: 199))
+        register.scan(Item(name: "Beans", priceEach: 199))
+        
+        register.addCoupon(Coupon(itemName: "Beans"))
+
+        let receipt = register.total()
+
+        XCTAssertEqual(369, receipt.total())
+    }
+
+    
+    
 
 }
